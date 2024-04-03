@@ -22,7 +22,7 @@ class HeicConverterApp():
         self.window.title("HEIC-Bilder konvertieren")
         self.window.geometry(self.geom)
 
-    def __frame_setup(self, label, initial=False) -> None:
+    def __frame_setup(self, label: str, initial=False) -> None:
         self.content = tk.Frame()
         self.label = tk.Label(self.window, text=label, wraplength=400)
         self.label.pack()
