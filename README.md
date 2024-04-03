@@ -9,3 +9,5 @@ You can either start the graphical app from `src/run.py`, or use the simple conv
 ```
 python3 heic_convert.py -d /home/user/Images/my_folder
 ```
+
+will convert all .heic-files inside my\_folder.
