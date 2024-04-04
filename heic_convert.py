@@ -6,26 +6,37 @@ from pillow_heif import register_heif_opener
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-parser.add_argument("-d", "--directory", default=None, type=str, help="Directory")
-parser.add_argument("-o", "--overwrite", default="n", type=str, help="Overwrite/delete original files [y/n]")
+parser.add_argument("directory", type=str, help="The directory containing the images to be converted.")
+parser.add_argument("-o", "--overwrite", action="store_true", help="Overwrite/delete original files")
+parser.add_argument("-f", "--format", type=str, default="JPEG", help="Format to convert to (supports JPEG or PNG)")
 args = vars(parser.parse_args())
-
-dirpath = os.path.abspath(args["directory"])
-overwrite = True if args["overwrite"] in ["Y", "y"] else False
 
 register_heif_opener()
 
+dirpath = os.path.abspath(args["directory"])
 heic_files = [file for file in os.listdir(dirpath) if file.endswith(".heic")]
 
-for i, file in enumerate(heic_files):
-    print(f"Converting {i+1}/{len(heic_files)}")
-    image = Image.open(os.path.join(dirpath, file))
+def convert_image(file: str, dir: str) -> None:
+    path = os.path.join(dir, file)
+    image = Image.open(path)
     base_name = os.path.splitext(os.path.basename(file))[0]
-    image.save(os.path.join(dirpath, f"{base_name}.jpeg"))
+    image.save(os.path.join(dirpath, f"{base_name}.{args["format"].lower()}"), format=f"{args["format"].upper()}")
 
-if overwrite:
+spinner = ['\\', '|', '/', '-'] 
+for i, file in enumerate(heic_files):
+    spinchar = spinner[i % len(spinner)]
+    print(f"\r{spinchar} Converting {i+1}/{len(heic_files)}", end="", flush=True)
+    try:
+        convert_image(file, dir=dirpath)
+    except Exception as e:
+        print(f"An error occured when attempting to convert {file}:\n{e}")
+
+print("\nDone converting.")
+
+if args["overwrite"]:
     for i, file in enumerate(heic_files):
-        print(f"Deleting {i+1}/{len(heic_files)}")
+        spinchar = spinner[i % len(spinner)]
+        print(f"\rDeleting {i+1}/{len(heic_files)}",end="", flush=True)
         os.remove(os.path.join(dirpath, file))
 
-print("Done.")
+print("\nDone.")
