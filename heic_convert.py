@@ -35,7 +35,6 @@ print("\nDone converting.")
 
 if args["overwrite"]:
     for i, file in enumerate(heic_files):
-        spinchar = spinner[i % len(spinner)]
         print(f"\rDeleting {i+1}/{len(heic_files)}",end="", flush=True)
         os.remove(os.path.join(dirpath, file))
 
